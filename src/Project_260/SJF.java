@@ -1,0 +1,311 @@
+/*
+Asmaa Alharbi  – 2006707
+Taif Almazmumi – 1909691
+ */
+package Project_260;
+
+import java.awt.Font;
+import java.io.FileNotFoundException;
+import java.io.File;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class SJF extends javax.swing.JFrame {
+
+    //number of processes
+    static int n = 5;
+
+    //Store all the information in SJF string 
+    static String SJF = "";
+
+    /**
+     * Creates new form SJF
+     *
+     * @throws java.io.FileNotFoundException
+     */
+    public SJF() throws FileNotFoundException {
+        initComponents();
+
+        File file = new File("input.txt");
+        Scanner input = new Scanner(file);
+
+        float TotalWaitTime = 0, AverageWaitTime = 0;
+        int[] Process = new int[n];
+        int[] Arrival = new int[n];
+        int[] Burst = new int[n];
+
+        //for loop to read the input from the file and save them into the arrays
+        for (int i = 0; i < n; i++) {
+            Process[i] = input.nextInt();//Process number
+            Arrival[i] = input.nextInt();//Arrival time
+            Burst[i] = input.nextInt();//Burst time
+        }
+
+        // -----------------------------------------------------------------------------------------------
+        // Shortest job First Algorithm
+        // -----------------------------------------------------------------------------------------------
+        // Creat Waiting time, Termination time, Turnaround time and Response time Arrays (for SJF)
+        float[] SJFWaiting = new float[n];
+        float[] SJFTurnaround = new float[n];
+        float[] SJFTermination = new float[n];
+        float[] SJFResponse = new float[n];
+
+        int[] B1 = new int[n];
+        TotalWaitTime = 0;
+        AverageWaitTime = 0;
+        int temp;
+
+        for (int i = 0; i < n; i++) {
+            B1[i] = (int) Burst[i];
+        }
+
+        for (int i = n; i >= 1; i--) {
+            for (int j = 1; j < n; j++) {
+                if (B1[j - 1] > B1[j]) {
+                    temp = B1[j - 1];
+                    B1[j - 1] = B1[j];
+                    B1[j] = temp;
+                }
+            }
+        }
+
+        //caculate waiting time 
+        SJFWaiting[0] = 0;
+        for (int i = 1; i < n; i++) {
+            SJFWaiting[i] = B1[i - 1] + SJFWaiting[i - 1];
+        }
+
+        float TerminationTime = 0;
+        for (int y = 0; y < n; y++) {
+            TerminationTime = TerminationTime + SJFWaiting[y];
+        }
+
+        //calculate Termination time
+        for (int i = 0; i < n; i++) {
+            SJFTermination[i] = B1[i] + SJFWaiting[i];
+        }
+        //calculate Turnaround Time
+        for (int i = 0; i < n; i++) {
+            SJFTurnaround[i] = SJFTermination[i] - Arrival[i];
+        }
+        //calculate Response time
+        for (int i = 0; i < n; i++) {
+            SJFResponse[i] = SJFTurnaround[i] - B1[i] - Arrival[i];
+        }
+
+        //Printing order of process execution
+        SJF += "\n__Printing order of process execution(SJF):_________";
+        SJF += ("\n");
+        int p[] = new int[n];
+        int counter = 0;
+        for (int i = 0; i < TerminationTime; i++) {
+            for (int j = 0; j < n; j++) {
+                if (Burst[j] == i) {
+                    SJF += ("      P-" + Process[j] + "- ");
+                    p[counter] = Process[j];
+                    counter++;
+                }
+            }
+        }
+        SJF += ("\n");
+
+        //Drawing Gantt chart representing order of process execution
+        SJF += ("\n___Drawing Gantt chart __________________________");
+        String GanttChart = printGanttChart(p, B1, SJFTurnaround);
+        SJF += (GanttChart);
+
+        //print processes details
+        SJF += ("\n Printing detailed results of each process:");
+        for (int i = 0; i < n; i++) {
+
+            SJF += ("\n___Process" + p[i] + "_________________________");
+            SJF += ("\n Termination time = " + SJFTermination[i]);
+            SJF += ("\n Response time = " + SJFResponse[i]);
+            SJF += ("\n Waiting time = " + SJFWaiting[i]);
+            SJF += ("\n Turnaround time = " + SJFTurnaround[i] + "\n");
+        }
+
+        //Calculating Average Weighting Time
+        SJF += ("\n\n___________________________________________________");
+        SJF += ("\nTotal and Average Waiting Time:");
+        for (int i = 0; i < n; i++) {
+            TotalWaitTime += SJFWaiting[i];
+        }
+        AverageWaitTime = TotalWaitTime / n;
+        SJF += ("\nTotal Waiting Time= " + TotalWaitTime);
+        SJF += ("\nAverage Waiting Time= " + AverageWaitTime + "\n");
+
+        Font f = new Font("Monospaced", Font.PLAIN, 12);
+        text.setFont(f);
+        text.setText(SJF);
+
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jLabel1 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        text = new javax.swing.JTextArea();
+        jLabel2 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel1.setFont(new java.awt.Font("Times New Roman", 0, 21)); // NOI18N
+        jLabel1.setText("SJF Scheduling");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(183, 17, -1, -1));
+
+        jButton1.setFont(new java.awt.Font("Times New Roman", 0, 16)); // NOI18N
+        jButton1.setText("Back");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(197, 519, 107, 37));
+
+        text.setColumns(20);
+        text.setRows(5);
+        jScrollPane1.setViewportView(text);
+
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(25, 82, 445, 419));
+
+        jLabel2.setFont(new java.awt.Font("Times New Roman", 0, 13)); // NOI18N
+        jLabel2.setText("Scroll up and down to see all the information");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 54, -1, -1));
+
+        jPanel1.setBackground(new java.awt.Color(229, 220, 227));
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 510, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 580, Short.MAX_VALUE)
+        );
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 510, 580));
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        this.setVisible(false);
+
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(SJF.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(SJF.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(SJF.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(SJF.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    new SJF().setVisible(true);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(SJF.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+    }
+
+    public static String printGanttChart(int[] process, int[] Burst, float[] turnaroundTimes) {
+
+        String GanttChart = "";
+
+        GanttChart += ("\n ");
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < Burst[i]; j++) {
+                GanttChart += ("--");
+            }
+            GanttChart += ("  ");
+        }
+
+        GanttChart += ("\n|");
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < Burst[i] - 1; j++) {
+                GanttChart += (" ");
+            }
+
+            GanttChart += ("P" + process[i]);
+            for (int j = 0; j < Burst[i] - 1; j++) {
+
+                GanttChart += (" ");
+            }
+
+            GanttChart += (" |");
+        }
+
+        GanttChart += ("\n ");
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < Burst[i]; j++) {
+                GanttChart += ("--");
+            }
+            GanttChart += ("  ");
+        }
+        GanttChart += ("\n");
+
+        GanttChart += ("0");
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < Burst[i]; j++) {
+
+                GanttChart += ("  ");
+            }
+            if (turnaroundTimes[i] > 9) {
+
+                GanttChart += ("\b");
+            }
+            GanttChart += " " + (int) (turnaroundTimes[i]);
+        }
+        GanttChart += ("\n");
+
+        return GanttChart;
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea text;
+    // End of variables declaration//GEN-END:variables
+}
